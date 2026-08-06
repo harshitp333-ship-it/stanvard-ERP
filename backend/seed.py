@@ -184,7 +184,7 @@ async def seed_students_and_parents(schools, all_classes, all_plans):
                         parent_users.append(User(
                             email=parent_email, password_hash=hash_password('parent123'),
                             full_name=father, role='parent',
-                            school_id=sc.id, linked_student_id=s.id,
+                            school_id=sc.id, linked_student_ids=[s.id],
                             phone=s.phone,
                         ))
         await students_col.insert_many([s.model_dump() for s in sc_students])

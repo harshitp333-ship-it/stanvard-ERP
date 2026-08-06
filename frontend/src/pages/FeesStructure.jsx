@@ -79,8 +79,8 @@ function PlanDiscountBadges({ plan }) {
   if (badges.length === 0) return <span className="text-xs text-muted-foreground">—</span>;
   return (
     <div className="flex flex-wrap gap-1">
-      {badges.map((b, i) => (
-        <Badge key={i} className="bg-[#ECFDF5] text-[#065F46] border border-[#A7F3D0] text-[10px]">{b}</Badge>
+      {badges.map((b) => (
+        <Badge key={b} className="bg-[#ECFDF5] text-[#065F46] border border-[#A7F3D0] text-[10px]">{b}</Badge>
       ))}
     </div>
   );

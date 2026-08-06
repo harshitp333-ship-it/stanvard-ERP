@@ -1,0 +1,37 @@
+{
+  "summary": "Comprehensive testing of the new plan-baked discount feature on Fee Plans (Admin) and Parent Pay portal. Backend pytest 10/11 passed (1 skipped only because parent.gn20250001 has empty linked_student_ids in current seed). Frontend end-to-end validated: admin creates a Fee Plan with plan-level %, yearly flat, and month-specific discounts; live preview computes gross/discount/net/save correctly (₹12,000 → ₹9,600, 20% saved; April ₹616.67 vs May ₹816.67); save persists; edit dialog reopens with all discount fields pre-filled. Parent portal shows 'You saved ₹3,600.00' banner and Pay Full (Annual) tab displays 'Plan discount -₹3,600' and reduced Total Payable. Old backend_test.py (root) untouched.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "seed data", "issue": "parent.gn20250001@stanvard.school has empty linked_student_ids (0 parents in DB have linked children). Not a code bug but blocks native parent-side pytest of fee-schedule without pre-linking. Worked around by PATCH-linking a student for the UI test."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "(Optional/seed) Consider seeding parent.gn20250001 with linked_student_ids so parent portal tests do not require manual linking."
+  ],
+  "critical_code_review_comments": [
+    "compute_plan_discount_breakdown and _validate_plan_discounts are well-factored; ordering (plan lump -> yearly -> month) matches doc and matches UI preview.",
+    "GET /api/fees/plans returns pre-existing plans without discount fields unchanged (backward-compat verified).",
+    "student_fee_schedule correctly aggregates plan-baked discounts into you_saved / plan_discount_total; per-month schedule reflects month-specific discounts.",
+    "Validation returns 400 for percent>100, negative value, month out of range (all confirmed)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/backend_test.py"
+  ],
+  "success_rate": {"backend": "100% (10/10 executed; 1 skipped due to seed)", "frontend": "100% (all critical flows verified)"},
+  "seed_data_creation": "Created (and cleaned up) TEST_UI3 fee plan with plan-percent 10%, yearly flat ₹1000, April flat ₹200; assigned it to GN-2025-0001, linked to parent.gn20250001 for the portal UI test, then reverted (deleted plan+assignment, unset parent.linked_student_ids).",
+  "should_call_test_agent_after_fix": false,
+  "should_main_agent_self_test": true,
+  "test_credentials": "admin.gn@stanvard.school/admin123, parent.gn20250001@stanvard.school/parent123, superadmin@stanvard.school/super123",
+  "context_for_next_testing_agent": "All plan-baked discount CRUD, validation, math (breakdown), backward compatibility, student fee-schedule integration, and parent portal rendering verified. Regression: student-level ad-hoc discount + Owner approval flow was NOT re-executed here as no fix was made; existing backend_test.py at /app/backend/backend_test.py covers legacy paths. If parent-portal pytest needs to run non-skipped, PATCH parent.gn20250001.linked_student_ids to include a student that has a plan-discount assignment.",
+  "rca_of_the_issue": "N/A — no defects found in the new discount feature."
+}
